@@ -9,6 +9,11 @@ const urls = {
         averageCheck: "/orders/stats/average-check",
         summary: "/orders/stats/summary",
     },
+    users: {
+        getById: (userId: number) => `/users/${userId}`,
+        updateUser: (userId: number) => `/users/${userId}`,
+        changePassword: '/users/changePassword',
+    },
 };
 
 export {
