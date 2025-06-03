@@ -74,7 +74,6 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="max-w-[1200px] mx-auto p-4 space-y-6"
-            style={{ marginLeft: '250px' }}
         >
             <SummaryCards
                 totalOrders={summary.totalOrders}
