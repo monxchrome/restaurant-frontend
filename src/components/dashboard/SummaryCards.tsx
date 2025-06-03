@@ -27,7 +27,7 @@ export const SummaryCards = ({ totalOrders, totalRevenue, averageCheck }: Props)
                 <CardHeader>
                     <CardTitle>Средний чек</CardTitle>
                 </CardHeader>
-                <CardContent className="text-2xl font-bold">{averageCheck}₽</CardContent>
+                <CardContent className="text-2xl font-bold">{averageCheck.toFixed(2)}₽</CardContent>
             </Card>
         </div>
     );

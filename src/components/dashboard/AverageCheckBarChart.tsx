@@ -9,7 +9,6 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-    Legend,
 } from "recharts";
 
 interface AverageCheck {
@@ -24,7 +23,7 @@ export const AverageCheckBarChart = ({ data }: Props) => {
     const chartData = [
         {
             name: "Средний чек",
-            value: data.averageCheck,
+            value: data.averageCheck.toFixed(2),
         },
     ];
 

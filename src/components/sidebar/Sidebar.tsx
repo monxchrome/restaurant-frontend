@@ -4,7 +4,6 @@ import { useRouter, usePathname } from 'next/navigation'
 import {
     Home,
     User,
-    Bell,
     List,
     ShoppingCart,
     LogOut,
@@ -12,11 +11,12 @@ import {
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import React from "react";
+import {NotificationsBell} from "@/components/notifications/NotificationsBell";
 
 const navItems = [
     { label: 'Домой', icon: Home, href: '/dashboard' },
     { label: 'Пользователь', icon: User, href: '/profile' },
-    { label: 'Уведомления', icon: Bell, href: '/notifications' },
     { label: 'Меню', icon: List, href: '/menu' },
     { label: 'Заказы', icon: ShoppingCart, href: '/orders' },
 ]
@@ -50,6 +50,10 @@ export function Sidebar() {
                         </Button>
                     </Link>
                 ))}
+
+                <div className="pl-1">
+                    <NotificationsBell />
+                </div>
             </div>
 
             <div>
