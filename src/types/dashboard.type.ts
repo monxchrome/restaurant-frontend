@@ -1,4 +1,13 @@
-export type OrderStatus = "PENDING" | "PREPARING" | "DELIVERED" | "CANCELLED" | "READY" | "DELIVERING"
+export const OrderStatus = {
+    PENDING: 'PENDING',
+    PREPARING: 'PREPARING',
+    READY: 'READY',
+    DELIVERING: 'DELIVERING',
+    DELIVERED: 'DELIVERED',
+    CANCELLED: 'CANCELLED',
+} as const
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
 
 export interface OrderStatusCount {
     status: OrderStatus

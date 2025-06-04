@@ -88,7 +88,6 @@ export default function ProfilePage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.4 }}
-            style={{marginLeft: "450px"}}
         >
             <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">
                 Профиль пользователя

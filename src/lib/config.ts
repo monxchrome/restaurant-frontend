@@ -17,6 +17,14 @@ const urls = {
         updateUser: (userId: number) => `/users/${userId}`,
         changePassword: '/users/changePassword',
     },
+    orders: {
+        getAll: '/orders',
+        getById: (orderId: number) => `/orders/${orderId}`,
+        createOrder: '/orders',
+        updateOrder: (orderId: number) => `/orders/${orderId}`,
+        updateOrderStatus: (orderId: number) => `/orders/${orderId}/status`,
+        deleteOrder: (orderId: number) => `/orders/${orderId}`,
+    },
 };
 
 export {
