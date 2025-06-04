@@ -1,7 +1,10 @@
 const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 const urls = {
-    login: '/auth/login',
+    auth: {
+        login: '/auth/login',
+        refresh: '/auth/refresh',
+    },
     stats: {
         status: "/orders/stats/status",
         countByDay: "/orders/stats/count-by-day",

@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { authService } from '@/lib/authService';
 import { userService } from '@/lib/userService';
 import { ProfileForm } from '@/components/profile/ProfileForm';
+import {useRequireAuth} from "@/hooks/useRequireAuth";
 
 function parseJwt(token: string) {
     try {
@@ -24,6 +25,8 @@ function parseJwt(token: string) {
 }
 
 export default function ProfilePage() {
+    useRequireAuth();
+
     const [userId, setUserId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({

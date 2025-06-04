@@ -9,8 +9,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { apiService } from "@/lib/apiService";
 import { motion, AnimatePresence } from "framer-motion";
 import {urls} from "@/lib/config";
+import {useRedirectIfAuthenticated} from "@/hooks/useRedirectAuthenticated";
 
 export default function LoginPage() {
+    useRedirectIfAuthenticated()
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -20,11 +22,10 @@ export default function LoginPage() {
         e.preventDefault();
 
         try {
-            const response = await apiService.post(urls.login, { email, password });
-            const { accessToken, refreshToken } = response.data;
+            const response = await apiService.post(urls.auth.login, { email, password });
+            const { accessToken } = response.data;
 
             localStorage.setItem("accessToken", accessToken);
-            localStorage.setItem("refreshToken", refreshToken);
 
             router.push("/dashboard");
         } catch {

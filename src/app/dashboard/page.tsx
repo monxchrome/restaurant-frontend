@@ -9,6 +9,7 @@ import { StatusRadialChart } from "@/components/dashboard/StatusRadialChart";
 import { motion } from "framer-motion";
 import {CountByDayLineChart} from "@/components/dashboard/CountByDayLineChart";
 import {AverageCheckBarChart} from "@/components/dashboard/AverageCheckBarChart";
+import {useRequireAuth} from "@/hooks/useRequireAuth";
 
 interface StatusStat {
     _count: { id: number };
@@ -32,6 +33,8 @@ interface Summary {
 }
 
 export default function DashboardPage() {
+    useRequireAuth();
+
     const [summary, setSummary] = useState<Summary | null>(null);
     const [statusStats, setStatusStats] = useState<StatusStat[]>([]);
     const [countByDay, setCountByDay] = useState<CountByDay[]>([]);
