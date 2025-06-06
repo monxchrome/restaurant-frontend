@@ -1,34 +1,49 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Order, orderService } from "@/lib/orderService"
 import { OrderStatus } from "@/types/dashboard.type"
 import { OrdersTable } from "@/components/orders/OrdersTable"
 import { EditOrderDialog } from "@/components/orders/EditOrderDialog"
 import { ConfirmDialog } from "@/components/orders/ConfirmDialog"
 import { OrdersPagination } from "@/components/orders/OrdersPagination"
+import { OrdersFilters } from "@/components/orders/OrdersFilters"
 
 const PAGE_SIZE = 10
 
 export default function OrdersPage() {
     const [page, setPage] = useState(1)
+    const [filters, setFilters] = useState<{
+        status?: string;
+        sortBy: string;
+        sortOrder: "asc" | "desc";
+    }>({
+        status: undefined,
+        sortBy: "createdAt",
+        sortOrder: "desc",
+    });
+
     const [editingOrder, setEditingOrder] = useState<Order | null>(null)
     const [deletingOrder, setDeletingOrder] = useState<Order | null>(null)
     const [serverErrors, setServerErrors] = useState<string[]>([])
 
     const queryClient = useQueryClient()
 
+    const fetchOrders = useCallback(() => {
+        return orderService.getAll(page, PAGE_SIZE, filters.status, filters.sortBy, filters.sortOrder)
+    }, [page, filters])
+
     const { data, isLoading } = useQuery({
-        queryKey: ['orders', page],
-        queryFn: () => orderService.getAll(page, PAGE_SIZE),
+        queryKey: ['orders', page, filters],
+        queryFn: fetchOrders,
     })
 
     const updateStatusMutation = useMutation({
         mutationFn: ({ orderId, status }: { orderId: number; status: OrderStatus }) =>
             orderService.updateOrderStatus(orderId, { status }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['orders', page] })
+            queryClient.invalidateQueries({ queryKey: ['orders', page, filters] })
         },
     })
 
@@ -36,7 +51,7 @@ export default function OrdersPage() {
         mutationFn: ({ orderId, data }: { orderId: number; data: Partial<Order> }) =>
             orderService.updateOrder(orderId, data),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['orders', page] })
+            queryClient.invalidateQueries({ queryKey: ['orders', page, filters] })
             setEditingOrder(null)
             setServerErrors([])
         },
@@ -52,7 +67,7 @@ export default function OrdersPage() {
     const deleteOrderMutation = useMutation({
         mutationFn: (orderId: number) => orderService.deleteOrder(orderId),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['orders', page] })
+            queryClient.invalidateQueries({ queryKey: ['orders', page, filters] })
             setDeletingOrder(null)
         },
     })
@@ -63,10 +78,10 @@ export default function OrdersPage() {
         updateStatusMutation.mutate({ orderId: order.id, status })
     }
 
-    const handleEditSubmit = (data: Partial<Order>) => {
-        if (!editingOrder) return
-        setServerErrors([])
-        updateOrderMutation.mutate({ orderId: editingOrder.id, data })
+    const handleEditSubmit = async (data: Partial<Order>): Promise<void> => {
+        if (!editingOrder) return;
+        setServerErrors([]);
+        await updateOrderMutation.mutateAsync({ orderId: editingOrder.id, data });
     }
 
     const handleDeleteConfirm = () => {
@@ -81,6 +96,8 @@ export default function OrdersPage() {
     return (
         <div className="p-6">
             <h1 className="text-3xl font-bold mb-6">Заказы</h1>
+
+            <OrdersFilters filters={filters} onChange={setFilters} />
 
             <OrdersTable
                 orders={orders}

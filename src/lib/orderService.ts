@@ -22,19 +22,25 @@ export interface Order {
     updatedAt?: string;
 }
 
-
-interface OrdersResponse {
-    orders: Order[];
-    total: number;
-    page: number;
-    pageSize: number;
-}
-
 const orderService = {
-    getAll: (page: number, pageSize: number = 10) =>
+    getAll: (
+        page: number,
+        pageSize: number,
+        status?: string,
+        sortBy: string = "createdAt",
+        sortOrder: "asc" | "desc" = "desc"
+    ) =>
         apiService
-            .get(`${urls.orders.getAll}?page=${page}&pageSize=${pageSize}`)
-            .then(res => res.data as OrdersResponse),
+            .get("/orders", {
+                params: {
+                    page,
+                    pageSize,
+                    status,
+                    sortBy,
+                    sortOrder,
+                },
+            })
+            .then((res) => res.data),
 
     updateOrder: (orderId: number, data: Partial<Order>) =>
         apiService.patch(`${urls.orders.updateOrder(orderId)}`, data),
