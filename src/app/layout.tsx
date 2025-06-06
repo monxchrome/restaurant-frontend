@@ -5,6 +5,7 @@ import "./globals.css";
 import { Sidebar } from "@/components/sidebar/Sidebar";
 import { usePathname } from "next/navigation";
 import { Providers } from "@/app/providers";
+import {Toaster} from "sonner";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
             {showSidebar && <Sidebar />}
             <main style={{ marginLeft: showSidebar ? 250 : 0 }}>
                 {children}
+                <Toaster position="bottom-left" />
             </main>
         </Providers>
         </body>

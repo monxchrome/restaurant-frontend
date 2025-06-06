@@ -7,20 +7,22 @@ import { menuService } from "@/lib/menuService";
 import MenuDrawer, { MenuItem } from "@/components/menu/MenuDrawer";
 import { MenuItemCard } from "@/components/menu/MenuItemCard";
 import { AnimatePresence, motion } from "framer-motion";
+import { MenuFilters } from "@/components/menu/MenuFilters";
 
 export default function MenuAdminPage() {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [open, setOpen] = useState(false);
     const [editItem, setEditItem] = useState<MenuItem | null>(null);
+    const [filters, setFilters] = useState({});
 
     const fetchItems = async () => {
-        const data = await menuService.getAll();
+        const data = await menuService.getAll(filters);
         setMenuItems(data);
     };
 
     useEffect(() => {
         fetchItems();
-    }, []);
+    }, [filters]);
 
     const handleEdit = (item: MenuItem) => {
         setEditItem(item);
@@ -29,7 +31,7 @@ export default function MenuAdminPage() {
 
     return (
         <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold">Меню</h1>
                 <Button
                     onClick={() => {
@@ -41,6 +43,8 @@ export default function MenuAdminPage() {
                     Добавить
                 </Button>
             </div>
+
+            <MenuFilters onChange={setFilters} />
 
             <motion.div layout className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <AnimatePresence>

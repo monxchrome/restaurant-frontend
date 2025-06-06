@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,18 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { menuService } from "@/lib/menuService";
 import Image from "next/image";
-import {
-    AlertDialog,
-    AlertDialogTrigger,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogCancel,
-    AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-import {baseURL} from "@/lib/config";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from "@/components/ui/alert-dialog";
+import { baseURL } from "@/lib/config";
+import { ImageCropDialog } from "./ImageCropDialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface MenuItem {
     id: number;
@@ -61,7 +54,7 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
     const [form, setForm] = useState({
         name: item?.name || "",
         description: item?.description || "",
-        price: item?.price ?? 0,
+        price: item?.price ?? "",
         category: item?.category || "SALADS_AND_SNACKS",
         visible: item?.visible ?? true,
         inStock: item?.inStock ?? true,
@@ -71,38 +64,46 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
     const [previewUrl, setPreviewUrl] = useState<string | null>(normalizeImageUrl(item?.imageUrl));
     const [imgError, setImgError] = useState(false);
 
-    useEffect(() => {
-        if (!imageFile) return;
+    const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); // состояние диалога удаления
 
-        const objectUrl = URL.createObjectURL(imageFile);
-        setPreviewUrl(objectUrl);
-
-        return () => URL.revokeObjectURL(objectUrl);
-    }, [imageFile]);
-
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-    ) => {
-        const { name, value } = e.target;
-
-        if (name === "price") {
-            const priceValue = value === "" ? 0 : Number(value);
-            setForm(prev => ({ ...prev, price: priceValue }));
-        } else {
-            setForm(prev => ({ ...prev, [name]: value }));
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImgError(false);
+            const objectUrl = URL.createObjectURL(file);
+            setPreviewUrl(objectUrl);
+            setImageFile(file);
+            setIsCropDialogOpen(true);
         }
     };
 
+    const handleCropSave = (croppedFile: File) => {
+        setImageFile(croppedFile);
+        const objectUrl = URL.createObjectURL(croppedFile);
+        setPreviewUrl(objectUrl);
+        setIsCropDialogOpen(false);
+    };
+
+    const handleCropCancel = () => {
+        if (imageFile && previewUrl && previewUrl.startsWith("blob:")) {
+            URL.revokeObjectURL(previewUrl);
+        }
+        setIsCropDialogOpen(false);
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        if (name === "price") {
+            const priceValue = value === "" ? 0 : Number(value);
+            setForm((prev) => ({ ...prev, price: priceValue }));
+        } else {
+            setForm((prev) => ({ ...prev, [name]: value }));
+        }
+    };
 
     const handleToggle = (key: "visible" | "inStock") => {
         setForm((prev) => ({ ...prev, [key]: !prev[key] }));
-    };
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files?.[0]) {
-            setImageFile(e.target.files[0]);
-            setImgError(false);
-        }
     };
 
     const buildFormData = () => {
@@ -124,26 +125,31 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
     const handleSubmit = async () => {
         try {
             const formData = buildFormData();
-
             if (item) {
                 await menuService.update(item.id, formData);
             } else {
                 await menuService.create(formData);
             }
-
+            toast.success(`Блюдо ${item ? "обновлено" : "добавлено"} успешно!`);
             onCloseAction();
             onSaveAction();
         } catch (e) {
-            alert("Ошибка при сохранении. Проверьте данные и попробуйте снова.");
+            toast.error("Ошибка при сохранении. Проверьте данные и попробуйте снова.");
             console.error(e);
         }
     };
 
     const handleDelete = async () => {
         if (item) {
-            await menuService.delete(item.id);
-            onCloseAction();
-            onSaveAction();
+            try {
+                await menuService.delete(item.id);
+                toast.success("Блюдо успешно удалено");
+                setIsDeleteDialogOpen(false);
+                onCloseAction();
+                onSaveAction();
+            } catch {
+                toast.error("Ошибка при удалении блюда");
+            }
         }
     };
 
@@ -154,7 +160,7 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
             <h2 className="text-xl font-bold mb-4">{item ? "Редактировать" : "Добавить"} блюдо</h2>
 
             <div className="space-y-4">
-                <Input name="name" value={form.name} onChange={handleChange} placeholder="Название"/>
+                <Input name="name" value={form.name} onChange={handleChange} placeholder="Название" />
 
                 <Textarea
                     name="description"
@@ -164,22 +170,24 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
                     className="min-h-[100px] resize-y"
                 />
 
-                <Input name="price" type="number" value={form.price} onChange={handleChange} placeholder="Цена"/>
+                <Input name="price" type="number" value={form.price} onChange={handleChange} placeholder="Цена" />
 
                 <div>
-                    <Label htmlFor="category">Категория</Label>
-                    <select
-                        name="category"
-                        id="category"
-                        value={form.category}
-                        onChange={handleChange}
-                    >
-                        {Object.entries(categories).map(([key, label]) => (
-                            <option key={key} value={key}>
-                                {label}
-                            </option>
-                        ))}
-                    </select>
+                    <Label htmlFor="category" className="mb-1">
+                        Категория
+                    </Label>
+                    <Select value={form.category} onValueChange={(value) => setForm((prev) => ({ ...prev, category: value }))}>
+                        <SelectTrigger id="category" className="w-full">
+                            <SelectValue placeholder="Выберите категорию" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {Object.entries(categories).map(([key, label]) => (
+                                <SelectItem key={key} value={key}>
+                                    {label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <div>
@@ -198,39 +206,28 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
                                     className="object-cover transition-opacity duration-300 group-hover:opacity-70"
                                     onError={() => setImgError(true)}
                                 />
-                                <div
-                                    className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity text-white text-sm font-medium">
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity text-white text-sm font-medium">
                                     Заменить фото
                                 </div>
                             </>
                         ) : (
                             <div className="relative flex h-full w-full items-center justify-center bg-gray-200">
-                                <div
-                                    className="z-10 text-gray-400 group-hover:text-white transition-colors duration-300">
-                                    Загрузить фото
-                                </div>
-                                <div
-                                    className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded"/>
+                                <div className="z-10 text-gray-400 group-hover:text-white transition-colors duration-300">Загрузить фото</div>
+                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded" />
                             </div>
                         )}
                     </label>
 
-                    <Input
-                        id="image-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                    />
+                    <Input id="image-upload" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Switch checked={form.visible} onCheckedChange={() => handleToggle("visible")}/>
+                    <Switch checked={form.visible} onCheckedChange={() => handleToggle("visible")} />
                     <Label>Отображать</Label>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Switch checked={form.inStock} onCheckedChange={() => handleToggle("inStock")}/>
+                    <Switch checked={form.inStock} onCheckedChange={() => handleToggle("inStock")} />
                     <Label>В наличии</Label>
                 </div>
             </div>
@@ -241,27 +238,43 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
                 </Button>
 
                 {item && (
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="destructive" className="w-full">
-                                Удалить
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Удалить это блюдо?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Это действие нельзя будет отменить. Блюдо будет безвозвратно удалено.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Отмена</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleDelete}>Удалить</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
+                    <>
+                        <Button variant="destructive" onClick={() => setIsDeleteDialogOpen(true)} className="w-full">
+                            Удалить
+                        </Button>
+
+                        {/* Диалог подтверждения удаления */}
+                        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Подтвердите удаление</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Вы действительно хотите удалить блюдо? Это действие нельзя отменить.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="space-x-2">
+                                    <Button variant="secondary" onClick={() => setIsDeleteDialogOpen(false)}>
+                                        Отмена
+                                    </Button>
+                                    <Button variant="destructive" onClick={handleDelete}>
+                                        Удалить
+                                    </Button>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </>
                 )}
+
+                <Button onClick={onCloseAction} variant="secondary" className="w-full">
+                    Отмена
+                </Button>
             </div>
+
+            {isCropDialogOpen && imageFile && (
+                <AlertDialog open={isCropDialogOpen} onOpenChange={(open) => !open && setIsCropDialogOpen(false)}>
+                    <ImageCropDialog imageSrc={URL.createObjectURL(imageFile)} onCancel={handleCropCancel} onSave={handleCropSave} />
+                </AlertDialog>
+            )}
         </div>
     );
 }
