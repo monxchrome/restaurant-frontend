@@ -1,0 +1,70 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { menuService } from "@/lib/menuService";
+import MenuDrawer, { MenuItem } from "@/components/menu/MenuDrawer";
+import { MenuItemCard } from "@/components/menu/MenuItemCard";
+import { AnimatePresence, motion } from "framer-motion";
+
+export default function MenuAdminPage() {
+    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+    const [open, setOpen] = useState(false);
+    const [editItem, setEditItem] = useState<MenuItem | null>(null);
+
+    const fetchItems = async () => {
+        const data = await menuService.getAll();
+        setMenuItems(data);
+    };
+
+    useEffect(() => {
+        fetchItems();
+    }, []);
+
+    const handleEdit = (item: MenuItem) => {
+        setEditItem(item);
+        setOpen(true);
+    };
+
+    return (
+        <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold">Меню</h1>
+                <Button
+                    onClick={() => {
+                        setEditItem(null);
+                        setOpen(true);
+                    }}
+                >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Добавить
+                </Button>
+            </div>
+
+            <motion.div layout className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <AnimatePresence>
+                    {menuItems.map((item) => (
+                        <motion.div
+                            key={item.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                            transition={{ duration: 0.3 }}
+                            layout
+                        >
+                            <MenuItemCard item={item} onClick={() => handleEdit(item)} />
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+            </motion.div>
+
+            <MenuDrawer
+                open={open}
+                onOpenChange={setOpen}
+                item={editItem}
+                onSaveAction={fetchItems}
+            />
+        </div>
+    );
+}

@@ -25,6 +25,13 @@ const urls = {
         updateOrderStatus: (orderId: number) => `/orders/${orderId}/status`,
         deleteOrder: (orderId: number) => `/orders/${orderId}`,
     },
+    menu: {
+        getAll: '/menu',
+        getById: (menuId: number) => `/menu/${menuId}`,
+        create: '/menu',
+        update: (menuId: number) => `/menu/${menuId}`,
+        delete: (menuId: number) => `/menu/${menuId}`,
+    }
 };
 
 export {
