@@ -4,6 +4,7 @@ const urls = {
     auth: {
         login: '/auth/login',
         refresh: '/auth/refresh',
+        logout: '/auth/logout',
     },
     stats: {
         status: "/orders/stats/status",

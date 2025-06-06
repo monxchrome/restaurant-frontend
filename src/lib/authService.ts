@@ -28,7 +28,17 @@ const authService = {
         }
     },
 
-    isAuth: () => !! localStorage.getItem(ACCESS_TOKEN_KEY)
+    isAuth: () => !! localStorage.getItem(ACCESS_TOKEN_KEY),
+
+    logout: async () => {
+        try {
+            await apiService.post(urls.auth.logout);
+        } catch (e) {
+            console.error('Logout failed:', e);
+        } finally {
+            authService.clearAccessToken();
+        }
+    },
 }
 
 export {

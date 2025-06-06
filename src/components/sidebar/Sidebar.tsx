@@ -13,6 +13,7 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import React from "react";
 import {NotificationsBell} from "@/components/notifications/NotificationsBell";
+import {authService} from "@/lib/authService";
 
 const navItems = [
     { label: 'Домой', icon: Home, href: '/dashboard' },
@@ -25,9 +26,8 @@ export function Sidebar() {
     const router = useRouter()
     const pathname = usePathname()
 
-    const handleLogout = () => {
-        localStorage.removeItem('access')
-        localStorage.removeItem('refresh')
+    const handleLogout = async () => {
+        await authService.logout();
         router.push('/login')
     }
 
