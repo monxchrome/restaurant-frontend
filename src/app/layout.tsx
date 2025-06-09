@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
     const pathname = usePathname();
 
-    const showSidebar = pathname !== "/login";
+    const showSidebar = pathname !== "/login" && pathname !== '/unauthorized';
 
     return (
         <html lang="en">
