@@ -39,6 +39,19 @@ const authService = {
             authService.clearAccessToken();
         }
     },
+
+    getCurrentUser: async () => {
+        const token = authService.getAccessToken();
+        if (!token) throw new Error('Нет access токена');
+
+        const res = await apiService.get(urls.auth.me, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return res.data;
+    }
 }
 
 export {

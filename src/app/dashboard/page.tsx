@@ -33,7 +33,7 @@ interface Summary {
 }
 
 export default function DashboardPage() {
-    useRequireAuth();
+    useRequireAuth(['ADMIN']);
 
     const [summary, setSummary] = useState<Summary | null>(null);
     const [statusStats, setStatusStats] = useState<StatusStat[]>([]);

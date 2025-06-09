@@ -11,6 +11,7 @@ interface OrdersTableProps {
     onStatusChange: (order: Order, status: OrderStatus) => void
     onEditClick: (order: Order) => void
     onDeleteClick: (order: Order) => void
+    userRole: string | null
 }
 
 const statusClasses: Record<OrderStatus, string> = {
@@ -31,7 +32,7 @@ const statusLabels: Record<string, string> = {
     CANCELLED: 'Отменён',
 }
 
-export function OrdersTable({ orders, onStatusChange, onEditClick, onDeleteClick }: OrdersTableProps) {
+export function OrdersTable({ orders, onStatusChange, onEditClick, onDeleteClick, userRole }: OrdersTableProps) {
     return (
         <Table>
             <TableHeader>
@@ -42,7 +43,7 @@ export function OrdersTable({ orders, onStatusChange, onEditClick, onDeleteClick
                     <TableHead>Адрес</TableHead>
                     <TableHead>Статус</TableHead>
                     <TableHead>Итог</TableHead>
-                    <TableHead className="text-center">Действия</TableHead>
+                    {userRole === 'ADMIN' && ( <TableHead className="text-center">Действия</TableHead> )}
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -73,12 +74,16 @@ export function OrdersTable({ orders, onStatusChange, onEditClick, onDeleteClick
                         </TableCell>
                         <TableCell>{order.totalPrice.toFixed(2)} ₽</TableCell>
                         <TableCell className="space-x-2 flex justify-center">
-                            <Button size="sm" variant="outline" onClick={() => onEditClick(order)}>
-                                Изменить
-                            </Button>
-                            <Button size="sm" variant="destructive" onClick={() => onDeleteClick(order)}>
-                                Удалить
-                            </Button>
+                            {userRole === 'ADMIN' && (
+                                <Button size="sm" variant="outline" onClick={() => onEditClick(order)}>
+                                    Изменить
+                                </Button>
+                            )}
+                            {userRole === 'ADMIN' && (
+                                <Button size="sm" variant="destructive" onClick={() => onDeleteClick(order)}>
+                                    Удалить
+                                </Button>
+                            )}
                         </TableCell>
                     </TableRow>
                 ))}

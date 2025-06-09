@@ -5,6 +5,7 @@ const urls = {
         login: '/auth/login',
         refresh: '/auth/refresh',
         logout: '/auth/logout',
+        me: '/auth/me',
     },
     stats: {
         status: "/orders/stats/status",

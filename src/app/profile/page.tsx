@@ -25,6 +25,7 @@ function parseJwt(token: string) {
 }
 
 export default function ProfilePage() {
+    useRequireAuth(['ADMIN', 'WAITER']);
     useRequireAuth();
 
     const [userId, setUserId] = useState<number | null>(null);
@@ -56,8 +57,12 @@ export default function ProfilePage() {
                         phone: user.phone || '',
                     });
                 })
-                .catch(() => {
-                    toast.error('Ошибка загрузки данных пользователя');
+                .catch((error) => {
+                    if (error.response?.status === 302) {
+                        console.warn('Redirect received, ignoring error');
+                    } else {
+                        toast.error('Ошибка загрузки данных пользователя');
+                    }
                 })
                 .finally(() => setLoading(false));
         } else {

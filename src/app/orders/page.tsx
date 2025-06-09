@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import React, { useState, useCallback } from 'react'
+import React, {useState, useCallback, useEffect} from 'react'
 import { Order, orderService } from "@/lib/orderService"
 import { OrderStatus } from "@/types/dashboard.type"
 import { OrdersTable } from "@/components/orders/OrdersTable"
@@ -9,10 +9,14 @@ import { EditOrderDialog } from "@/components/orders/EditOrderDialog"
 import { ConfirmDialog } from "@/components/orders/ConfirmDialog"
 import { OrdersPagination } from "@/components/orders/OrdersPagination"
 import { OrdersFilters } from "@/components/orders/OrdersFilters"
+import {authService} from "@/lib/authService";
+import {useRequireAuth} from "@/hooks/useRequireAuth";
 
 const PAGE_SIZE = 10
 
 export default function OrdersPage() {
+    useRequireAuth(['ADMIN', 'WAITER']);
+
     const [page, setPage] = useState(1)
     const [filters, setFilters] = useState<{
         status?: string;
@@ -27,6 +31,20 @@ export default function OrdersPage() {
     const [editingOrder, setEditingOrder] = useState<Order | null>(null)
     const [deletingOrder, setDeletingOrder] = useState<Order | null>(null)
     const [serverErrors, setServerErrors] = useState<string[]>([])
+    const [currentUserRole, setCurrentUserRole] = useState<string | null>(null)
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const user = await authService.getCurrentUser()
+                setCurrentUserRole(user.role)
+            } catch (e) {
+                console.error('Ошибка при получении пользователя', e)
+            }
+        }
+
+        fetchUser()
+    }, [])
 
     const queryClient = useQueryClient()
 
@@ -104,6 +122,7 @@ export default function OrdersPage() {
                 onStatusChange={handleStatusChange}
                 onEditClick={setEditingOrder}
                 onDeleteClick={setDeletingOrder}
+                userRole={currentUserRole}
             />
 
             <div className="mt-6 flex justify-center">

@@ -8,8 +8,11 @@ import MenuDrawer, { MenuItem } from "@/components/menu/MenuDrawer";
 import { MenuItemCard } from "@/components/menu/MenuItemCard";
 import { AnimatePresence, motion } from "framer-motion";
 import { MenuFilters } from "@/components/menu/MenuFilters";
+import {useRequireAuth} from "@/hooks/useRequireAuth";
 
 export default function MenuAdminPage() {
+    useRequireAuth(['ADMIN']);
+
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [open, setOpen] = useState(false);
     const [editItem, setEditItem] = useState<MenuItem | null>(null);
