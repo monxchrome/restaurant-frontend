@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button'; // Предполагается, что shadcn/ui настроен и есть кнопка
+import {useRouter} from 'next/navigation';
+import {Button} from '@/components/ui/button';
 
 export default function UnauthorizedPage() {
     const router = useRouter();

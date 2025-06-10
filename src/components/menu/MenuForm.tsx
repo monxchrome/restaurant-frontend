@@ -1,33 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { menuService } from "@/lib/menuService";
+import {useState} from "react";
+import {Input} from "@/components/ui/input";
+import {Button} from "@/components/ui/button";
+import {Textarea} from "@/components/ui/textarea";
+import {Switch} from "@/components/ui/switch";
+import {Label} from "@/components/ui/label";
+import {menuService} from "@/lib/menuService";
 import Image from "next/image";
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from "@/components/ui/alert-dialog";
-import { baseURL } from "@/lib/config";
-import { ImageCropDialog } from "./ImageCropDialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
-
-interface MenuItem {
-    id: number;
-    name: string;
-    description?: string;
-    price: number;
-    imageUrl?: string;
-    createdAt: string;
-    category: string;
-    visible: boolean;
-    inStock: boolean;
-}
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle
+} from "@/components/ui/alert-dialog";
+import {baseURL} from "@/lib/config";
+import {ImageCropDialog} from "./ImageCropDialog";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {toast} from "sonner";
+import {IMenuItem} from "@/types/menu.type";
 
 interface MenuFormProps {
-    item: MenuItem | null;
+    item: IMenuItem | null;
     onCloseAction: () => void;
     onSaveAction: () => void;
 }
@@ -65,7 +61,7 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
     const [imgError, setImgError] = useState(false);
 
     const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); // состояние диалога удаления
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

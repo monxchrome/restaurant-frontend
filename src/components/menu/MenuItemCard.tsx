@@ -1,9 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { MenuItem } from "@/components/menu/MenuDrawer";
-import { useState } from "react";
+import {Card, CardContent} from "@/components/ui/card";
+import {Badge} from "@/components/ui/badge";
+import {useState} from "react";
 import Image from "next/image";
-import { baseURL } from "@/lib/config";
+import {baseURL} from "@/lib/config";
+import {IMenuItem} from "@/types/menu.type";
 
 const normalizeImageUrl = (url?: string) => {
     if (!url) return null;
@@ -16,7 +16,7 @@ export function MenuItemCard({
                                  item,
                                  onClick,
                              }: {
-    item: MenuItem;
+    item: IMenuItem;
     onClick: () => void;
 }) {
     const [imgError, setImgError] = useState(false);

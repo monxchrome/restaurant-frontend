@@ -1,21 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { menuService } from "@/lib/menuService";
-import MenuDrawer, { MenuItem } from "@/components/menu/MenuDrawer";
-import { MenuItemCard } from "@/components/menu/MenuItemCard";
-import { AnimatePresence, motion } from "framer-motion";
-import { MenuFilters } from "@/components/menu/MenuFilters";
+import {useEffect, useState} from "react";
+import {Button} from "@/components/ui/button";
+import {Plus} from "lucide-react";
+import {menuService} from "@/lib/menuService";
+import MenuDrawer from "@/components/menu/MenuDrawer";
+import {MenuItemCard} from "@/components/menu/MenuItemCard";
+import {AnimatePresence, motion} from "framer-motion";
+import {MenuFilters} from "@/components/menu/MenuFilters";
 import {useRequireAuth} from "@/hooks/useRequireAuth";
+import {IMenuItem} from "@/types/menu.type";
 
 export default function MenuAdminPage() {
     useRequireAuth(['ADMIN']);
 
-    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+    const [menuItems, setMenuItems] = useState<IMenuItem[]>([]);
     const [open, setOpen] = useState(false);
-    const [editItem, setEditItem] = useState<MenuItem | null>(null);
+    const [editItem, setEditItem] = useState<IMenuItem | null>(null);
     const [filters, setFilters] = useState({});
 
     const fetchItems = async () => {
@@ -27,7 +28,7 @@ export default function MenuAdminPage() {
         fetchItems();
     }, [filters]);
 
-    const handleEdit = (item: MenuItem) => {
+    const handleEdit = (item: IMenuItem) => {
         setEditItem(item);
         setOpen(true);
     };

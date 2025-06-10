@@ -9,21 +9,25 @@ export const OrderStatus = {
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
 
-export interface OrderStatusCount {
+export interface IOrderStatusCount {
     status: OrderStatus
     _count: {
         id: number
     }
 }
 
-export interface SummaryStats {
+export interface ISummaryStats {
     totalOrders: number
     totalRevenue: number
     averageCheck: number
-    countByStatus: OrderStatusCount[]
 }
 
-export interface RevenueByDay {
+export interface IRevenueByDay {
     day: string
     revenue: number
+}
+
+export interface ICountByDay {
+    day: string;
+    count: number;
 }

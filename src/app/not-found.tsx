@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {useEffect, useState} from "react";
 
 const PARTICLE_COUNT = 40;
 
@@ -41,7 +41,6 @@ export default function Particle404() {
     }, []);
 
     if (particles4.length === 0 || particles0.length === 0) {
-        // Можно вернуть null или заглушку, пока не сгенерировались частицы
         return null;
     }
 

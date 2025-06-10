@@ -1,23 +1,11 @@
 'use client';
 
 import React from "react";
-import {
-    RadialBarChart,
-    RadialBar,
-    Legend,
-    Tooltip,
-    ResponsiveContainer,
-} from "recharts";
-
-interface StatusStat {
-    status: string;
-    _count: {
-        id: number;
-    };
-}
+import {Legend, RadialBar, RadialBarChart, ResponsiveContainer, Tooltip,} from "recharts";
+import {IOrderStatusCount} from "@/types/dashboard.type";
 
 interface Props {
-    data?: StatusStat[];
+    data?: IOrderStatusCount[];
 }
 
 interface TooltipProps {
@@ -30,7 +18,6 @@ interface TooltipProps {
 
 const COLORS = ["#3b82f6", "#10b981", "#f97316", "#ef4444", "#8b5cf6"];
 
-// Переводим статус
 const translateStatus = (status: string) => {
     switch (status) {
         case "PENDING":

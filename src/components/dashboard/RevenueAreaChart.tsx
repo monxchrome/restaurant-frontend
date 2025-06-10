@@ -1,14 +1,6 @@
 "use client";
 
-import {
-    AreaChart,
-    Area,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-    CartesianGrid,
-} from "recharts";
+import {Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
 
 interface RevenueChartProps {
     data: {
@@ -32,7 +24,7 @@ export function RevenueAreaChart({ data }: RevenueChartProps) {
                     <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
                     <XAxis
                         dataKey="day"
-                        tick={{ fontSize: 12, fill: "#6b7280" }} // меньше и серый текст
+                        tick={{ fontSize: 12, fill: "#6b7280" }}
                         tickLine={false}
                         axisLine={{ stroke: "#d1d5db" }}
                     />

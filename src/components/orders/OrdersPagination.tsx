@@ -1,11 +1,11 @@
 import {
     Pagination,
     PaginationContent,
+    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
-    PaginationPrevious,
     PaginationNext,
-    PaginationEllipsis,
+    PaginationPrevious,
 } from "@/components/ui/pagination"
 
 interface OrdersPaginationProps {
@@ -24,13 +24,13 @@ export const OrdersPagination = ({ page, totalPages, onPageChange }: OrdersPagin
             }
         } else {
             if (page > 2) pages.push(1)
-            if (page > 3) pages.push(-1) // -1 = ellipsis
+            if (page > 3) pages.push(-1)
 
             for (let i = Math.max(1, page - 1); i <= Math.min(totalPages, page + 1); i++) {
                 pages.push(i)
             }
 
-            if (page < totalPages - 2) pages.push(-2) // -2 = ellipsis
+            if (page < totalPages - 2) pages.push(-2)
             if (page < totalPages - 1) pages.push(totalPages)
         }
 

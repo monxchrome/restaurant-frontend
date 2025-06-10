@@ -1,44 +1,24 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
-import { SummaryCards } from "@/components/dashboard/SummaryCards";
-import { statsService } from "@/lib/statsService";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RevenueAreaChart } from "@/components/dashboard/RevenueAreaChart";
-import { StatusRadialChart } from "@/components/dashboard/StatusRadialChart";
-import { motion } from "framer-motion";
+import React, {useEffect, useState} from "react";
+import {SummaryCards} from "@/components/dashboard/SummaryCards";
+import {statsService} from "@/lib/statsService";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {RevenueAreaChart} from "@/components/dashboard/RevenueAreaChart";
+import {StatusRadialChart} from "@/components/dashboard/StatusRadialChart";
+import {motion} from "framer-motion";
 import {CountByDayLineChart} from "@/components/dashboard/CountByDayLineChart";
 import {AverageCheckBarChart} from "@/components/dashboard/AverageCheckBarChart";
 import {useRequireAuth} from "@/hooks/useRequireAuth";
-
-interface StatusStat {
-    _count: { id: number };
-    status: string;
-}
-
-interface CountByDay {
-    day: string;
-    count: number;
-}
-
-interface RevenueByDay {
-    day: string;
-    revenue: number;
-}
-
-interface Summary {
-    totalOrders: number;
-    totalRevenue: number;
-    averageCheck: number;
-}
+import {ICountByDay, IOrderStatusCount, IRevenueByDay, ISummaryStats} from "@/types/dashboard.type";
 
 export default function DashboardPage() {
     useRequireAuth(['ADMIN']);
 
-    const [summary, setSummary] = useState<Summary | null>(null);
-    const [statusStats, setStatusStats] = useState<StatusStat[]>([]);
-    const [countByDay, setCountByDay] = useState<CountByDay[]>([]);
-    const [revenueByDay, setRevenueByDay] = useState<RevenueByDay[]>([]);
+    const [summary, setSummary] = useState<ISummaryStats | null>(null);
+    const [statusStats, setStatusStats] = useState<IOrderStatusCount[]>([]);
+    const [countByDay, setCountByDay] = useState<ICountByDay[]>([]);
+    const [revenueByDay, setRevenueByDay] = useState<IRevenueByDay[]>([]);
     const [averageCheck, setAverageCheck] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
 

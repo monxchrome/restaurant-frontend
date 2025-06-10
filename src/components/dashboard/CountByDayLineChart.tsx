@@ -1,24 +1,11 @@
 'use client';
 
 import React from "react";
-import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-    ResponsiveContainer,
-} from "recharts";
-
-interface CountByDay {
-    day: string;
-    count: number;
-}
+import {CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,} from "recharts";
+import {ICountByDay} from "@/types/dashboard.type";
 
 interface Props {
-    data: CountByDay[];
+    data: ICountByDay[];
 }
 
 export const CountByDayLineChart = ({ data }: Props) => {

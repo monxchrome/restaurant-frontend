@@ -1,21 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { io, Socket } from 'socket.io-client'
+import {useEffect, useState} from 'react'
+import {io, Socket} from 'socket.io-client'
 import {baseURL} from "@/lib/config";
-
-export interface Notification {
-    id: string
-    title: string
-    body: string
-    read: boolean
-    createdAt: string
-}
+import {INotification} from "@/types/notification.type";
 
 let socket: Socket
 
 export const useNotifications = () => {
-    const [notifications, setNotifications] = useState<Notification[]>([])
+    const [notifications, setNotifications] = useState<INotification[]>([])
 
     useEffect(() => {
         socket = io(baseURL)
@@ -25,7 +18,7 @@ export const useNotifications = () => {
         })
 
         socket.on('orderUpdate', (data) => {
-            const newNotification: Notification = {
+            const newNotification: INotification = {
                 id: String(Date.now()),
                 title: data.type === 'CREATED' ? 'Новый заказ' : 'Обновление заказа',
                 body: `Заказ: ${data.order.clientName} ${data.order.clientSurname}`,
