@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import {useEffect} from 'react';
+import {AnimatePresence, motion} from 'framer-motion';
+import {Button} from '@/components/ui/button';
 
 interface ShadcnAlertProps {
     message: string;

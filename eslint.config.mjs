@@ -1,73 +1,25 @@
-import {FlatCompat} from '@eslint/eslintrc';
-import typescriptParser from '@typescript-eslint/parser';
-import eslintPlugin from '@typescript-eslint/eslint-plugin';
-import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
-import importPlugin from 'eslint-plugin-import';
-import prettierPlugin from 'eslint-plugin-prettier';
+import js from '@eslint/js'
+import {FlatCompat} from '@eslint/eslintrc'
 
 const compat = new FlatCompat({
-  baseDirectory: new URL('.', import.meta.url).pathname,
-  recommended: true,
-});
+  // import.meta.dirname is available after Node.js v20.11.0
+  baseDirectory: import.meta.dirname,
+  recommendedConfig: js.configs.recommended,
+})
 
-export default [
-  ...compat.extends(
-      'plugin:@typescript-eslint/recommended',
-      'plugin:prettier/recommended',
-      'prettier',
-  ),
-  {
-    files: ['*.ts', '*.tsx'],
-    languageOptions: {
-      parser: typescriptParser,
-      parserOptions: {
-        project: './tsconfig.json',
-        sourceType: 'module',
-        ecmaVersion: 2020,
-      },
-    },
-    plugins: {
-      '@typescript-eslint': eslintPlugin,
-      'simple-import-sort': simpleImportSortPlugin,
-      import: importPlugin,
-      prettier: prettierPlugin,
-    },
+const eslintConfig = [
+  ...compat.config({
+    plugins: ["@typescript-eslint"],
+    extends: ['eslint:recommended', 'next'],
     rules: {
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        { argsIgnorePattern: 'req|res|next' },
-      ],
-      '@typescript-eslint/interface-name-prefix': 'off',
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      'simple-import-sort/imports': [
-        'error',
-        {
-          groups: [
-            ['^react$', '^node:'],
-            ['^@?\\w'],
-            ['^@/'],
-            ['^\\.'],
-            ['^.+\\.s?css$'],
-          ],
-        },
-      ],
-      'import/first': 'error',
-      'import/newline-after-import': ['error', { count: 1 }],
-      'import/no-duplicates': 'error',
-      'no-console': 'warn',
-      'sort-imports': [
-        'error',
-        {
-          ignoreCase: true,
-          ignoreDeclarationSort: true,
-          ignoreMemberSort: false,
-          memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
-          allowSeparatedGroups: false,
-        },
-      ],
+      'react/no-unescaped-entities': 'off',
+      '@next/next/no-page-custom-font': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'no-unused-vars': "off",
+      'no-undef': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off'
     },
-    ignores: ['.eslintrc.js'],
-  },
-];
+  }),
+]
+
+export default eslintConfig

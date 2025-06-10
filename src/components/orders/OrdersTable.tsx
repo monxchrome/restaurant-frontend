@@ -1,16 +1,16 @@
 import React from 'react'
 import {OrderStatus} from "@/types/dashboard.type";
-import {Order} from "@/lib/orderService";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
+import {IOrder} from "@/types/order.type";
 
 interface OrdersTableProps {
-    orders: Order[]
-    onStatusChange: (order: Order, status: OrderStatus) => void
-    onEditClick: (order: Order) => void
-    onDeleteClick: (order: Order) => void
+    orders: IOrder[]
+    onStatusChange: (order: IOrder, status: OrderStatus) => void
+    onEditClick: (order: IOrder) => void
+    onDeleteClick: (order: IOrder) => void
     userRole: string | null
 }
 

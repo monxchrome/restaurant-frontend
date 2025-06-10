@@ -1,16 +1,17 @@
 'use client'
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import React, {useState, useCallback, useEffect} from 'react'
-import { Order, orderService } from "@/lib/orderService"
-import { OrderStatus } from "@/types/dashboard.type"
-import { OrdersTable } from "@/components/orders/OrdersTable"
-import { EditOrderDialog } from "@/components/orders/EditOrderDialog"
-import { ConfirmDialog } from "@/components/orders/ConfirmDialog"
-import { OrdersPagination } from "@/components/orders/OrdersPagination"
-import { OrdersFilters } from "@/components/orders/OrdersFilters"
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
+import React, {useCallback, useEffect, useState} from 'react'
+import {orderService} from "@/lib/orderService"
+import {OrderStatus} from "@/types/dashboard.type"
+import {OrdersTable} from "@/components/orders/OrdersTable"
+import {EditOrderDialog} from "@/components/orders/EditOrderDialog"
+import {ConfirmDialog} from "@/components/orders/ConfirmDialog"
+import {OrdersPagination} from "@/components/orders/OrdersPagination"
+import {OrdersFilters} from "@/components/orders/OrdersFilters"
 import {authService} from "@/lib/authService";
 import {useRequireAuth} from "@/hooks/useRequireAuth";
+import {IOrder} from "@/types/order.type";
 
 const PAGE_SIZE = 10
 
@@ -28,8 +29,8 @@ export default function OrdersPage() {
         sortOrder: "desc",
     });
 
-    const [editingOrder, setEditingOrder] = useState<Order | null>(null)
-    const [deletingOrder, setDeletingOrder] = useState<Order | null>(null)
+    const [editingOrder, setEditingOrder] = useState<IOrder | null>(null)
+    const [deletingOrder, setDeletingOrder] = useState<IOrder | null>(null)
     const [serverErrors, setServerErrors] = useState<string[]>([])
     const [currentUserRole, setCurrentUserRole] = useState<string | null>(null)
 
@@ -66,7 +67,7 @@ export default function OrdersPage() {
     })
 
     const updateOrderMutation = useMutation({
-        mutationFn: ({ orderId, data }: { orderId: number; data: Partial<Order> }) =>
+        mutationFn: ({ orderId, data }: { orderId: number; data: Partial<IOrder> }) =>
             orderService.updateOrder(orderId, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['orders', page, filters] })
@@ -92,11 +93,11 @@ export default function OrdersPage() {
 
     if (isLoading) return <div>Загрузка заказов...</div>
 
-    const handleStatusChange = (order: Order, status: OrderStatus) => {
+    const handleStatusChange = (order: IOrder, status: OrderStatus) => {
         updateStatusMutation.mutate({ orderId: order.id, status })
     }
 
-    const handleEditSubmit = async (data: Partial<Order>): Promise<void> => {
+    const handleEditSubmit = async (data: Partial<IOrder>): Promise<void> => {
         if (!editingOrder) return;
         setServerErrors([]);
         await updateOrderMutation.mutateAsync({ orderId: editingOrder.id, data });

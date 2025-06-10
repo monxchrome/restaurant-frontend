@@ -9,11 +9,11 @@ import {
 } from "@/components/ui/dialog";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import {Order} from "@/lib/orderService";
-import { motion, AnimatePresence } from "framer-motion";
+import {AnimatePresence, motion} from "framer-motion";
+import {IOrder} from "@/types/order.type";
 
 interface EditOrderDialogProps {
-    order: Order | null;
+    order: IOrder | null;
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (data: {
