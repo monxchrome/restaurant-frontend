@@ -1,12 +1,17 @@
-import type { NextConfig } from "next";
+import {NextConfig} from "next";
 
 const nextConfig: NextConfig = {
     images: {
         remotePatterns: [
             {
+                protocol: 'https',
+                hostname: 'storage.googleapis.com',
+                pathname: '/**',
+            },
+            {
                 protocol: 'http',
                 hostname: 'localhost',
-                port: '3000',
+                port: '3001',
                 pathname: '/**',
             },
         ],

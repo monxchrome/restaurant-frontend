@@ -24,6 +24,10 @@ const translateStatus = (status: string) => {
             return "Ожидает";
         case "PREPARING":
             return "Готовится";
+        case "READY":
+            return "Готов";
+        case "DELIVERING":
+            return "Доставляется";
         case "DELIVERED":
             return "Доставлен";
         case "CANCELLED":
@@ -86,7 +90,7 @@ export const StatusRadialChart = ({ data }: Props) => {
                     )}
                 />
                 <Tooltip
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                     
                     // @ts-expect-error
                     formatter={(value: number, name: string, props: TooltipProps) => [`${value}`, props.payload.name]}
                     labelFormatter={() => ""}
