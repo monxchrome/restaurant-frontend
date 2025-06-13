@@ -1,6 +1,7 @@
 "use client";
 
 import { Geist, Geist_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css";
 import { Sidebar } from "@/components/sidebar/Sidebar";
 import { usePathname } from "next/navigation";
@@ -35,6 +36,7 @@ export default function RootLayout({
             <main style={{ marginLeft: showSidebar ? 250 : 0 }}>
                 {children}
                 <Toaster position="bottom-left" />
+                <SpeedInsights />
             </main>
         </Providers>
         </body>
