@@ -12,7 +12,7 @@ import {useRequireAuth} from "@/hooks/useRequireAuth";
 import {IMenuItem} from "@/types/menu.type";
 
 export default function MenuAdminPage() {
-    useRequireAuth(['ADMIN']);
+    useRequireAuth(['ADMIN', 'WAITER']);
 
     const [menuItems, setMenuItems] = useState<IMenuItem[]>([]);
     const [open, setOpen] = useState(false);

@@ -1,12 +1,12 @@
 "use client";
 
-import {useState} from "react";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
-import {Textarea} from "@/components/ui/textarea";
-import {Switch} from "@/components/ui/switch";
-import {Label} from "@/components/ui/label";
-import {menuService} from "@/lib/menuService";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { menuService } from "@/lib/menuService";
 import Image from "next/image";
 import {
     AlertDialog,
@@ -14,18 +14,25 @@ import {
     AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogHeader,
-    AlertDialogTitle
+    AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {baseURL} from "@/lib/config";
-import {ImageCropDialog} from "./ImageCropDialog";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {toast} from "sonner";
-import {IMenuItem} from "@/types/menu.type";
+import { baseURL } from "@/lib/config";
+import { ImageCropDialog } from "./ImageCropDialog";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
+import { IMenuItem } from "@/types/menu.type";
 
 interface MenuFormProps {
     item: IMenuItem | null;
     onCloseAction: () => void;
     onSaveAction: () => void;
+    userRole: string | null;
 }
 
 const normalizeImageUrl = (url?: string) => {
@@ -46,7 +53,12 @@ const categories = {
     EXTRAS: "Дополнительно",
 } as const;
 
-export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuFormProps) {
+export default function MenuForm({
+                                     item,
+                                     onCloseAction,
+                                     onSaveAction,
+                                     userRole,
+                                 }: MenuFormProps) {
     const [form, setForm] = useState({
         name: item?.name || "",
         description: item?.description || "",
@@ -57,11 +69,15 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
     });
 
     const [imageFile, setImageFile] = useState<File | null>(null);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(normalizeImageUrl(item?.imageUrl));
+    const [previewUrl, setPreviewUrl] = useState<string | null>(
+        normalizeImageUrl(item?.imageUrl)
+    );
     const [imgError, setImgError] = useState(false);
 
     const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+    const isAdmin = userRole === "ADMIN";
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -88,7 +104,9 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
         setIsCropDialogOpen(false);
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
         const { name, value } = e.target;
         if (name === "price") {
             const priceValue = value === "" ? 0 : Number(value);
@@ -104,15 +122,18 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
 
     const buildFormData = () => {
         const formData = new FormData();
-        formData.append("name", form.name);
-        formData.append("description", form.description);
-        formData.append("price", form.price.toString());
-        formData.append("category", form.category);
-        formData.append("visible", form.visible ? "true" : "false");
         formData.append("inStock", form.inStock ? "true" : "false");
 
-        if (imageFile) {
-            formData.append("image", imageFile);
+        if (isAdmin) {
+            formData.append("name", form.name);
+            formData.append("description", form.description);
+            formData.append("price", form.price.toString());
+            formData.append("category", form.category);
+            formData.append("visible", form.visible ? "true" : "false");
+
+            if (imageFile) {
+                formData.append("image", imageFile);
+            }
         }
 
         return formData;
@@ -153,79 +174,120 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
 
     return (
         <div className="max-h-[80vh] overflow-y-auto p-4">
-            <h2 className="text-xl font-bold mb-4">{item ? "Редактировать" : "Добавить"} блюдо</h2>
+            <h2 className="text-xl font-bold mb-4">
+                {item ? "Редактировать" : "Добавить"} блюдо
+            </h2>
 
             <div className="space-y-4">
-                <Input name="name" value={form.name} onChange={handleChange} placeholder="Название" />
-
-                <Textarea
-                    name="description"
-                    value={form.description}
-                    onChange={handleChange}
-                    placeholder="Описание"
-                    className="min-h-[100px] resize-y"
-                />
-
-                <Input name="price" type="number" value={form.price} onChange={handleChange} placeholder="Цена" />
-
-                <div>
-                    <Label htmlFor="category" className="mb-1">
-                        Категория
-                    </Label>
-                    <Select value={form.category} onValueChange={(value) => setForm((prev) => ({ ...prev, category: value }))}>
-                        <SelectTrigger id="category" className="w-full">
-                            <SelectValue placeholder="Выберите категорию" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {Object.entries(categories).map(([key, label]) => (
-                                <SelectItem key={key} value={key}>
-                                    {label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+                {isAdmin && (
+                    <>
+                        <Input
+                            name="name"
+                            value={form.name}
+                            onChange={handleChange}
+                            placeholder="Название"
+                        />
+                        <Textarea
+                            name="description"
+                            value={form.description}
+                            onChange={handleChange}
+                            placeholder="Описание"
+                            className="min-h-[100px] resize-y"
+                        />
+                        <Input
+                            name="price"
+                            type="number"
+                            value={form.price}
+                            onChange={handleChange}
+                            placeholder="Цена"
+                        />
+                        <div>
+                            <Label htmlFor="category" className="mb-1">
+                                Категория
+                            </Label>
+                            <Select
+                                value={form.category}
+                                onValueChange={(value) =>
+                                    setForm((prev) => ({ ...prev, category: value }))
+                                }
+                            >
+                                <SelectTrigger id="category" className="w-full">
+                                    <SelectValue placeholder="Выберите категорию" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {Object.entries(categories).map(([key, label]) => (
+                                        <SelectItem key={key} value={key}>
+                                            {label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </>
+                )}
 
                 <div>
                     <Label>Изображение</Label>
-
                     <label
                         htmlFor="image-upload"
-                        className="relative group mt-1 block h-40 w-full overflow-hidden rounded border cursor-pointer"
+                        className={`relative group mt-1 block h-40 w-full overflow-hidden rounded border ${
+                            isAdmin ? "cursor-pointer" : "cursor-default"
+                        }`}
                     >
                         {validImage ? (
                             <>
                                 <Image
                                     src={previewUrl!}
-                                    alt="Предпросмотр"
+                                    alt="Фото блюда"
                                     fill
                                     className="object-cover transition-opacity duration-300 group-hover:opacity-70"
                                     onError={() => setImgError(true)}
                                 />
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity text-white text-sm font-medium">
-                                    Заменить фото
-                                </div>
+                                {isAdmin && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity text-white text-sm font-medium">
+                                        Заменить фото
+                                    </div>
+                                )}
                             </>
                         ) : (
                             <div className="relative flex h-full w-full items-center justify-center bg-gray-200">
-                                <div className="z-10 text-gray-400 group-hover:text-white transition-colors duration-300">Загрузить фото</div>
-                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded" />
+                                <div className="z-10 text-gray-400 group-hover:text-white transition-colors duration-300">
+                                    {isAdmin ? "Загрузить фото" : "Нет изображения"}
+                                </div>
+                                {isAdmin && (
+                                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded" />
+                                )}
                             </div>
                         )}
                     </label>
-
-                    <Input id="image-upload" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                    {isAdmin && (
+                        <Input
+                            id="image-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="hidden"
+                        />
+                    )}
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Switch checked={form.visible} onCheckedChange={() => handleToggle("visible")} />
-                    <Label>Отображать</Label>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <Switch checked={form.inStock} onCheckedChange={() => handleToggle("inStock")} />
+                    <Switch
+                        checked={form.inStock}
+                        onCheckedChange={() => handleToggle("inStock")}
+                    />
                     <Label>В наличии</Label>
                 </div>
+
+                {isAdmin && (
+                    <div className="flex items-center gap-2">
+                        <Switch
+                            checked={form.visible}
+                            onCheckedChange={() => handleToggle("visible")}
+                        />
+                        <Label>Отображать</Label>
+                    </div>
+                )}
             </div>
 
             <div className="flex flex-col gap-2 mt-4">
@@ -233,23 +295,32 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
                     {item ? "Сохранить изменения" : "Добавить"}
                 </Button>
 
-                {item && (
+                {isAdmin && item && (
                     <>
-                        <Button variant="destructive" onClick={() => setIsDeleteDialogOpen(true)} className="w-full">
+                        <Button
+                            variant="destructive"
+                            onClick={() => setIsDeleteDialogOpen(true)}
+                            className="w-full"
+                        >
                             Удалить
                         </Button>
-
-                        {/* Диалог подтверждения удаления */}
-                        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                        <AlertDialog
+                            open={isDeleteDialogOpen}
+                            onOpenChange={setIsDeleteDialogOpen}
+                        >
                             <AlertDialogContent>
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>Подтвердите удаление</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                        Вы действительно хотите удалить блюдо? Это действие нельзя отменить.
+                                        Вы действительно хотите удалить блюдо? Это действие нельзя
+                                        отменить.
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter className="space-x-2">
-                                    <Button variant="secondary" onClick={() => setIsDeleteDialogOpen(false)}>
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => setIsDeleteDialogOpen(false)}
+                                    >
                                         Отмена
                                     </Button>
                                     <Button variant="destructive" onClick={handleDelete}>
@@ -267,8 +338,15 @@ export default function MenuForm({ item, onCloseAction, onSaveAction }: MenuForm
             </div>
 
             {isCropDialogOpen && imageFile && (
-                <AlertDialog open={isCropDialogOpen} onOpenChange={(open) => !open && setIsCropDialogOpen(false)}>
-                    <ImageCropDialog imageSrc={URL.createObjectURL(imageFile)} onCancel={handleCropCancel} onSave={handleCropSave} />
+                <AlertDialog
+                    open={isCropDialogOpen}
+                    onOpenChange={(open) => !open && setIsCropDialogOpen(false)}
+                >
+                    <ImageCropDialog
+                        imageSrc={URL.createObjectURL(imageFile)}
+                        onCancel={handleCropCancel}
+                        onSave={handleCropSave}
+                    />
                 </AlertDialog>
             )}
         </div>

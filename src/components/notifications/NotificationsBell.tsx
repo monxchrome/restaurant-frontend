@@ -11,8 +11,12 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
-export const NotificationsBell = () => {
-    const { notifications, markAsRead, unreadCount } = useNotifications()
+interface NotificationsBellProps {
+    soundEnabled: boolean
+}
+
+export const NotificationsBell = ({ soundEnabled }: NotificationsBellProps) => {
+    const { notifications, markAsRead, unreadCount } = useNotifications(soundEnabled)
 
     return (
         <DropdownMenu>

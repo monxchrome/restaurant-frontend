@@ -2,6 +2,8 @@ import MenuForm from "./MenuForm";
 import {Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle} from "@/components/ui/drawer";
 import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
 import {IMenuItem} from "@/types/menu.type";
+import {useEffect, useState} from "react";
+import {authService} from "@/lib/authService";
 
 interface MenuDrawerProps {
     open: boolean;
@@ -11,6 +13,21 @@ interface MenuDrawerProps {
 }
 
 export default function MenuDrawer({open, onOpenChange, item, onSaveAction,}: MenuDrawerProps) {
+    const [currentUserRole, setCurrentUserRole] = useState<string | null>(null)
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const user = await authService.getCurrentUser()
+                setCurrentUserRole(user.role)
+            } catch (e) {
+                console.error('Ошибка при получении пользователя', e)
+            }
+        }
+
+        fetchUser()
+    }, [])
+
     return (
         <Drawer
             open={open}
@@ -30,6 +47,7 @@ export default function MenuDrawer({open, onOpenChange, item, onSaveAction,}: Me
                     item={item}
                     onCloseAction={() => onOpenChange(false)}
                     onSaveAction={onSaveAction}
+                    userRole={currentUserRole}
                 />
             </DrawerContent>
         </Drawer>
